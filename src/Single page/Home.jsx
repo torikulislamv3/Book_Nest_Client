@@ -1,8 +1,13 @@
-import React from 'react'
+import { useLoaderData } from "react-router-dom"
 
 const Home = () => {
+  const Book_items = useLoaderData();
+  console.log(Book_items)
   return (
-    <div>Home</div>
+    <div>
+        this is loader for {Book_items.length}
+        
+    </div>
   )
 }
 
