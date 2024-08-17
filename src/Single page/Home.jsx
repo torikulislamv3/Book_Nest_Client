@@ -3,46 +3,54 @@ import { useState, useEffect } from "react";
 import SingleBook from "./Components/SingleBook";
 
 const Home = () => {
-  const Book_items = useLoaderData(); // Fetching data
-  const [filteredBooks, setFilteredBooks] = useState(Book_items); // State for filtered books
-  const [selectedCategory, setSelectedCategory] = useState(""); // State for selected category
-  const [searchQuery, setSearchQuery] = useState(""); // State for search query
+  const Book_items = useLoaderData() || [];
+  const [filteredBooks, setFilteredBooks] = useState(Book_items);
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [sortOption, setSortOption] = useState("");
 
-  // Handle category change
   const handleCategoryChange = (event) => {
     setSelectedCategory(event.target.value);
   };
 
-  // Handle search query change
   const handleSearchChange = (event) => {
     setSearchQuery(event.target.value);
   };
 
-  // Filtering logic
+  const handleSortChange = (event) => {
+    setSortOption(event.target.value);
+  };
+
   useEffect(() => {
     let filtered = Book_items;
 
-    // Filter by category
-    if (selectedCategory !== "") {
+    if (selectedCategory) {
       filtered = filtered.filter(
         (item) => item.category === selectedCategory
       );
     }
 
-    // Filter by search query
-    if (searchQuery !== "") {
+    if (searchQuery) {
       filtered = filtered.filter((item) =>
         item.title?.toLowerCase().includes(searchQuery.toLowerCase())
       );
     }
 
-    setFilteredBooks(filtered); // Set filtered books to state
-  }, [Book_items, selectedCategory, searchQuery]);
+    if (sortOption === "Low to High") {
+      filtered = filtered.sort((a, b) => a.price - b.price);
+    } else if (sortOption === "High to Low") {
+      filtered = filtered.sort((a, b) => b.price - a.price);
+    } else if (sortOption === "Newest first") {
+      filtered = filtered.sort((a, b) => new Date(b.publishedDate) - new Date(a.publishedDate));
+    }
+
+    console.log("Filtered and Sorted Books:", filtered);
+    setFilteredBooks(filtered);
+  }, [Book_items, selectedCategory, searchQuery, sortOption]);
 
   return (
     <div>
       <section className="flex justify-between mt-6">
-        {/* Category Filter */}
         <select
           className="select select-bordered w-full max-w-xs"
           value={selectedCategory}
@@ -55,7 +63,6 @@ const Home = () => {
           <option value="Self Development">Self Development</option>
         </select>
 
-        {/* Search Input */}
         <input
           type="text"
           placeholder="Search Your Book"
@@ -64,18 +71,18 @@ const Home = () => {
           onChange={handleSearchChange}
         />
 
-        {/* Sorting options (currently not implemented) */}
-        <select className="select select-bordered w-full max-w-xs">
-          <option value="" disabled>
-            Select Option
-          </option>
-          <option>Low to High</option>
-          <option>High to Low</option>
-          <option>Newest first</option>
+        <select
+          className="select select-bordered w-full max-w-xs"
+          value={sortOption}
+          onChange={handleSortChange}
+        >
+          <option value="">Select Option</option>
+          <option value="Low to High">Low to High</option>
+          <option value="High to Low">High to Low</option>
+          <option value="Newest first">Newest first</option>
         </select>
       </section>
 
-      {/* Book List */}
       <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
         {filteredBooks.length > 0 ? (
           filteredBooks.map((item) => (
