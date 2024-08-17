@@ -1,52 +1,47 @@
-import { useLoaderData } from "react-router-dom";
-import { useState, useEffect } from "react";
-import SingleBook from "./Components/SingleBook";
+import { useState, useEffect } from 'react';
+import { useLoaderData, useSearchParams } from 'react-router-dom';
+import SingleBook from './Components/SingleBook';
+import Pagination from './Pagination';
 
 const Home = () => {
-  const Book_items = useLoaderData() || [];
-  const [filteredBooks, setFilteredBooks] = useState(Book_items);
+  const { books, totalPages } = useLoaderData();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const currentPage = parseInt(searchParams.get('page') || '1', 10);
+
   const [selectedCategory, setSelectedCategory] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [sortOption, setSortOption] = useState("");
 
-  const handleCategoryChange = (event) => {
-    setSelectedCategory(event.target.value);
-  };
-
-  const handleSearchChange = (event) => {
-    setSearchQuery(event.target.value);
-  };
-
-  const handleSortChange = (event) => {
-    setSortOption(event.target.value);
-  };
+  const itemsPerPage = 10;
 
   useEffect(() => {
-    let filtered = Book_items;
+    setSearchParams({ page: currentPage });
+  }, [currentPage, setSearchParams]);
 
-    if (selectedCategory) {
-      filtered = filtered.filter(
-        (item) => item.category === selectedCategory
-      );
+  const handlePageChange = (pageNumber) => {
+    setSearchParams({ page: pageNumber });
+  };
+
+  const filteredBooks = books.filter((book) => {
+    if (selectedCategory && book.category !== selectedCategory) {
+      return false;
     }
-
-    if (searchQuery) {
-      filtered = filtered.filter((item) =>
-        item.title?.toLowerCase().includes(searchQuery.toLowerCase())
-      );
+    if (searchQuery && !book.title.toLowerCase().includes(searchQuery.toLowerCase())) {
+      return false;
     }
+    return true;
+  });
 
+  const sortedBooks = (() => {
     if (sortOption === "Low to High") {
-      filtered = filtered.sort((a, b) => a.price - b.price);
+      return filteredBooks.sort((a, b) => a.price - b.price);
     } else if (sortOption === "High to Low") {
-      filtered = filtered.sort((a, b) => b.price - a.price);
+      return filteredBooks.sort((a, b) => b.price - a.price);
     } else if (sortOption === "Newest first") {
-      filtered = filtered.sort((a, b) => new Date(b.publishedDate) - new Date(a.publishedDate));
+      return filteredBooks.sort((a, b) => new Date(b.publishedDate) - new Date(a.publishedDate));
     }
-
-    console.log("Filtered and Sorted Books:", filtered);
-    setFilteredBooks(filtered);
-  }, [Book_items, selectedCategory, searchQuery, sortOption]);
+    return filteredBooks;
+  })();
 
   return (
     <div>
@@ -54,7 +49,7 @@ const Home = () => {
         <select
           className="select select-bordered w-full max-w-xs"
           value={selectedCategory}
-          onChange={handleCategoryChange}
+          onChange={(e) => setSelectedCategory(e.target.value)}
         >
           <option value="">Select Category</option>
           <option value="Programming Language">Programming Language</option>
@@ -68,13 +63,13 @@ const Home = () => {
           placeholder="Search Your Book"
           className="input input-bordered input-primary w-full max-w-xs"
           value={searchQuery}
-          onChange={handleSearchChange}
+          onChange={(e) => setSearchQuery(e.target.value)}
         />
 
         <select
           className="select select-bordered w-full max-w-xs"
           value={sortOption}
-          onChange={handleSortChange}
+          onChange={(e) => setSortOption(e.target.value)}
         >
           <option value="">Select Option</option>
           <option value="Low to High">Low to High</option>
@@ -84,14 +79,20 @@ const Home = () => {
       </section>
 
       <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
-        {filteredBooks.length > 0 ? (
-          filteredBooks.map((item) => (
+        {sortedBooks.length > 0 ? (
+          sortedBooks.map((item) => (
             <SingleBook key={item._id} item={item} />
           ))
         ) : (
           <p>No books found.</p>
         )}
       </section>
+
+      <Pagination
+        totalPages={totalPages}
+        currentPage={currentPage}
+        onPageChange={handlePageChange}
+      />
     </div>
   );
 };
