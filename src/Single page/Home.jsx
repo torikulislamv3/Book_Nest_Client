@@ -6,10 +6,12 @@ const Home = () => {
   console.log(Book_items)
   return (
     <div>
-        this is loader for {Book_items.length}
-        {
+       
+       <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+       {
           Book_items.map((item)=> <SingleBook key={item._id} item = {item}></SingleBook>)
         }
+       </section>
     </div>
   )
 }

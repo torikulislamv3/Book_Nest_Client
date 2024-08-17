@@ -1,9 +1,36 @@
 const SingleBook = ({item}) => {
-    // const product = {_id, name, image, description, price, category, ratings, createdDate, createdTime} = item;
+    const {_id, name, image, description, price, category, ratings, createdDate, createdTime} = item;
   return (
-    <div>
-        this is book card
+    <div className="card bg-white w-96 shadow-xl h-auto">
+    <figure className="px-10 pt-10">
+      <img
+        src={image}
+        alt="Shoes"
+        className="rounded-xl" />
+    </figure>
+    <div className="card-body items-center text-center">
+      <h2 className="card-title">{name}</h2>
+      <div className="grid grid-cols-2">
+            <div>
+               <p>
+               {description}
+               </p>
+               <p>
+                {category}
+               </p>
+            </div>
+            <div>
+                <p>{price}</p>
+                <p>{ratings}</p>
+                <p>{createdDate}</p>
+                <p>{createdTime}</p>
+            </div>
+      </div>
+      <div className="card-actions">
+        <button className="btn btn-primary">Buy Now</button>
+      </div>
     </div>
+  </div>
   )
 }
 
