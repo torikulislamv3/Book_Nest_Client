@@ -15,11 +15,16 @@ const Home = () => {
   const itemsPerPage = 10;
 
   useEffect(() => {
-    setSearchParams({ page: currentPage });
-  }, [currentPage, setSearchParams]);
+    setSearchParams({
+      page: currentPage,
+      category: selectedCategory,
+      search: searchQuery,
+      sort: sortOption
+    });
+  }, [currentPage, selectedCategory, searchQuery, sortOption, setSearchParams]);
 
   const handlePageChange = (pageNumber) => {
-    setSearchParams({ page: pageNumber });
+    setSearchParams(prev => ({ ...prev, page: pageNumber }));
   };
 
   const filteredBooks = books.filter((book) => {

@@ -1,7 +1,8 @@
 const SingleBook = ({item}) => {
     const {_id, name, image, description, price, category, ratings, createdDate, createdTime} = item;
   return (
-    <div className="card bg-blak w-96 shadow-xl h-auto">
+    <div className="card bg-gray-700 w-96 shadow-xl h-auto">
+    
     <figure className="px-10 pt-10">
       <img
         src={image}
